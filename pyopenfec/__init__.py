@@ -1,1 +1,1 @@
-from utils import make_request
+from candidate import Candidate
