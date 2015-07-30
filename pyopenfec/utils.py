@@ -1,15 +1,19 @@
-import exceptions
 import json
 import os
 
 import requests
+import six
+
+if six.PY2:
+    from exceptions import Exception
+
 
 API_KEY = os.environ.get('OPENFEC_API_KEY', None)
 BASE_URL = 'https://api.open.fec.gov'
 VERSION = '/v1'
 
 
-class PyOpenFecException(exceptions.Exception):
+class PyOpenFecException(Exception):
     """
     An exception from the PyOpenFec API.
     """
