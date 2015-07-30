@@ -8,6 +8,7 @@ API_KEY = os.environ.get('OPENFEC_API_KEY', None)
 BASE_URL = 'https://api.open.fec.gov'
 VERSION = '/v1'
 
+
 class PyOpenFecException(exceptions.Exception):
     """
     An exception from the PyOpenFec API.
@@ -83,7 +84,7 @@ class PyOpenFecApiClass(object):
         params['api_key'] = API_KEY
 
         r = requests.get(url, params=params)
-        print r.url
+        print(r.url)
 
         if r.status_code != 200:
             raise OpenFecException('OpenFEC site returned a status code of %s for this request.' % r.status_code)
