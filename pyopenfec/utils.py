@@ -42,7 +42,7 @@ class PyOpenFecApiClass(object):
 
     @classmethod
     def count(cls, **kwargs):
-        resource = '%ss' % cls.__name__.lower()
+        resource = '{class_name}s'.format(class_name=cls.__name__.lower())
         initial_results = cls._make_request(resource, **kwargs)
         if initial_results.get('pagination', None):
             return initial_results['pagination']['count']
