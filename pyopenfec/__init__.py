@@ -1,1 +1,1 @@
-from candidate import Candidate
+from .candidate import Candidate
