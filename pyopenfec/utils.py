@@ -78,7 +78,7 @@ class PyOpenFecApiClass(object):
         url = BASE_URL + VERSION + '/%s' % resource
 
         if not API_KEY:
-            raise OpenFecException('Please export an env var OPENFEC_API_KEY with your API key.')
+            raise PyOpenFecException('Please export an env var OPENFEC_API_KEY with your API key.')
 
         params = dict(kwargs)
         params['api_key'] = API_KEY
@@ -87,6 +87,6 @@ class PyOpenFecApiClass(object):
         print(r.url)
 
         if r.status_code != 200:
-            raise OpenFecException('OpenFEC site returned a status code of %s for this request.' % r.status_code)
+            raise PyOpenFecException('OpenFEC site returned a status code of %s for this request.' % r.status_code)
 
         return r.json()
