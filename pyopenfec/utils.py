@@ -32,39 +32,15 @@ class PyOpenFecException(Exception):
         return repr(self.value)
 
 
-class PyOpenFecSession(object):
-    """
-    Mixin to avoid rate limit issues
-    """
-    def __init__(self, *args, **kwargs):
-        self._rate_window = datetime.timedelta(
-            seconds=kwargs.get('rate_window', 3600))
-        self._max_requests = kwargs.get('max_requests', 1000)
-
-    def _make_request(self, resource, **kwargs):
-        try:
-            diff = datetime.now() - self._base_request_time
-        except AttributeError:
-            self._base_request_time = datetime.now()
-
-        if diff >= self._timespan:
-            self._request_count = 0
-            self._base_request_time = datetime.now()
-
-        else:
-            if self._request_count > self._max_requests:
-                wait_time = self._timespan - diff
-                time.sleep(wait_time)
-
-        self._request_count += 1
-
-        super(PyOpenFecSession, self)._make_request(resource, **kwargs)
-
-
 class PyOpenFecApiClass(object):
     """
     Universal class for PyOpenFec API classes to inherit from.
     """
+    base_request_time = datetime.datetime.now()
+    request_count = 0
+    rate_window = datetime.timedelta(seconds=3600)
+    max_requests = 1000
+
     def to_dict(self):
         return self.__dict__()
 
@@ -109,7 +85,20 @@ class PyOpenFecApiClass(object):
         return payload
 
     @classmethod
+    def _check_rate_limit(cls):
+        diff = datetime.datetime.now() - cls.base_request_time
+
+        if diff >= cls.rate_window:
+            cls.request_count = 0
+            cls.base_request_time = datetime.now()
+        else:
+            if cls.request_count > cls.max_requests:
+                wait_time = cls.rate_window - diff
+                time.sleep(wait_time)
+
+    @classmethod
     def _make_request(cls, resource, **kwargs):
+        cls._check_rate_limit()
         url = BASE_URL + VERSION + '/%s' % resource
 
         if not API_KEY:
@@ -119,6 +108,7 @@ class PyOpenFecApiClass(object):
         params['api_key'] = API_KEY
 
         r = requests.get(url, params=params)
+        cls.request_count += 1
         print(r.url)
 
         if r.status_code != 200:
