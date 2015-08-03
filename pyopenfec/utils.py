@@ -1,5 +1,7 @@
 import json
 import os
+import datetime
+import time
 
 import requests
 import six
@@ -28,6 +30,35 @@ class PyOpenFecException(Exception):
 
     def __repr__(self):
         return repr(self.value)
+
+
+class PyOpenFecSession(object):
+    """
+    Mixin to avoid rate limit issues
+    """
+    def __init__(self, *args, **kwargs):
+        self._rate_window = datetime.timedelta(
+            seconds=kwargs.get('rate_window', 3600))
+        self._max_requests = kwargs.get('max_requests', 1000)
+
+    def _make_request(self, resource, **kwargs):
+        try:
+            diff = datetime.now() - self._base_request_time
+        except AttributeError:
+            self._base_request_time = datetime.now()
+
+        if diff >= self._timespan:
+            self._request_count = 0
+            self._base_request_time = datetime.now()
+
+        else:
+            if self._request_count > self._max_requests:
+                wait_time = self._timespan - diff
+                time.sleep(wait_time)
+
+        self._request_count += 1
+
+        super(PyOpenFecSession, self)._make_request(resource, **kwargs)
 
 
 class PyOpenFecApiClass(object):
