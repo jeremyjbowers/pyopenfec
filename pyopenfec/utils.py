@@ -2,6 +2,7 @@ import json
 import os
 import datetime
 import time
+import logging
 
 import requests
 import six
@@ -58,12 +59,11 @@ class PyOpenFecApiClass(object):
     def fetch(cls, **kwargs):
         resource = '%ss' % cls.__name__.lower()
         initial_results = cls._make_request(resource, **kwargs)
-        payload = []
 
         if initial_results.get('results', None):
             if len(initial_results['results']) > 0:
                 for result in initial_results['results']:
-                    payload.append(cls(**result))
+                    yield cls(**result)
 
         if initial_results.get('pagination', None):
             if initial_results['pagination'].get('pages', None):
@@ -78,11 +78,9 @@ class PyOpenFecApiClass(object):
                         if paged_results.get('results', None):
                             if len(paged_results['results']) > 0:
                                 for result in paged_results['results']:
-                                    payload.append(cls(**result))
+                                    yield cls(**result)
 
                         current_page += 1
-
-        return payload
 
     @classmethod
     def _check_rate_limit(cls):
@@ -94,6 +92,9 @@ class PyOpenFecApiClass(object):
         else:
             if cls.request_count > cls.max_requests:
                 wait_time = cls.rate_window - diff
+                logging.warn(
+                    'Rate limit was about to be exceeded. Waiting {}s.'.format(
+                        wait_time.seconds))
                 time.sleep(wait_time)
 
     @classmethod
@@ -109,7 +110,7 @@ class PyOpenFecApiClass(object):
 
         r = requests.get(url, params=params)
         cls.request_count += 1
-        print(r.url)
+        logging.debug(r.url)
 
         if r.status_code != 200:
             raise PyOpenFecException('OpenFEC site returned a status code of %s for this request.' % r.status_code)

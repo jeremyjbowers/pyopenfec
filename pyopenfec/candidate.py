@@ -1,5 +1,6 @@
 from pyopenfec import utils
 
+
 class Candidate(utils.PyOpenFecApiClass):
 
     def __init__(self, **kwargs):
@@ -19,11 +20,13 @@ class Candidate(utils.PyOpenFecApiClass):
         self.party_full = None
         self.state = None
 
-        for k,v in kwargs.items():
+        for k, v in kwargs.items():
             setattr(self, k, v)
 
     def __unicode__(self):
-        return unicode("%s (%s)" % (self.name, self.candidate_id))
+        return unicode("{name} {id}".format(name=self.name,
+                                            id=self.candidate_id))
 
     def __str__(self):
-        return repr("%s (%s)" % (self.name, self.candidate_id))
+        return repr("{name} {id}".format(name=self.name,
+                                         id=self.candidate_id))
