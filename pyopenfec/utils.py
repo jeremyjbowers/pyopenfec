@@ -1,6 +1,5 @@
 import json
 import os
-import datetime
 import time
 import logging
 
@@ -37,10 +36,8 @@ class PyOpenFecApiClass(object):
     """
     Universal class for PyOpenFec API classes to inherit from.
     """
-    base_request_time = datetime.datetime.now()
-    request_count = 0
-    rate_window = datetime.timedelta(seconds=3600)
-    max_requests = 1000
+    ratelimit_remaining = 1000
+    wait_time = 0.5
 
     def to_dict(self):
         return self.__dict__()
@@ -57,7 +54,10 @@ class PyOpenFecApiClass(object):
 
     @classmethod
     def fetch(cls, **kwargs):
-        resource = '%ss' % cls.__name__.lower()
+        if 'resource' in kwargs:
+            resource = kwargs.pop('resource')
+        else:
+            resource = '%ss' % cls.__name__.lower()
         initial_results = cls._make_request(resource, **kwargs)
 
         if initial_results.get('results', None):
@@ -83,23 +83,25 @@ class PyOpenFecApiClass(object):
                         current_page += 1
 
     @classmethod
-    def _check_rate_limit(cls):
-        diff = datetime.datetime.now() - cls.base_request_time
+    def _throttled_request(cls, url, params):
 
-        if diff >= cls.rate_window:
-            cls.request_count = 0
-            cls.base_request_time = datetime.now()
-        else:
-            if cls.request_count > cls.max_requests:
-                wait_time = cls.rate_window - diff
+        if cls.ratelimit_remaining == 0:
+            while cls.ratelimit_remaining == 0:
+                cls.wait_time = cls.wait_time * 1.5
                 logging.warn(
                     'Rate limit was about to be exceeded. Waiting {}s.'.format(
-                        wait_time.seconds))
-                time.sleep(wait_time)
+                        cls.wait_time))
+                time.sleep(cls.wait_time)
+                response = requests.get(url, params=params)
+                cls.ratelimit_remaining = int(response.headers['x-ratelimit-remaining'])
+        else:
+            response = requests.get(url, params=params)
+            cls.ratelimit_remaining = int(response.headers['x-ratelimit-remaining'])
+
+        return response
 
     @classmethod
     def _make_request(cls, resource, **kwargs):
-        cls._check_rate_limit()
         url = BASE_URL + VERSION + '/%s' % resource
 
         if not API_KEY:
@@ -108,8 +110,7 @@ class PyOpenFecApiClass(object):
         params = dict(kwargs)
         params['api_key'] = API_KEY
 
-        r = requests.get(url, params=params)
-        cls.request_count += 1
+        r = cls._throttled_request(url, params)
         logging.debug(r.url)
 
         if r.status_code != 200:
