@@ -1,6 +1,7 @@
 from . import utils
 from .filing import Filing
 from .report import Report
+from .aggregates import CommitteeTotals
 
 
 class Committee(utils.PyOpenFecApiClass):
@@ -23,6 +24,7 @@ class Committee(utils.PyOpenFecApiClass):
         self.state = None
         self.treasurer_name = None
         self._history = None
+        self._totals = None
 
         for k, v in kwargs.items():
             setattr(self, k, v)
@@ -43,6 +45,15 @@ class Committee(utils.PyOpenFecApiClass):
             for hp in CommitteeHistoryPeriod.fetch(resource=resource_path):
                 self._history[hp.cycle] = hp
         return self._history
+
+    @property
+    def totals(self):
+        if self._totals is None:
+            self._totals = {}
+            resource_path = 'committee/{cid}/totals'.format(cid=self.committee_id)
+            for ct in CommitteeTotals.fetch(resource=resource_path):
+                self._totals[ct.cycle] = ct
+        return self._totals
 
     def select_filings(self, **kwargs):
         return [f for f in Filing.fetch(committee_id=self.committee_id, **kwargs)]

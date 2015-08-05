@@ -40,7 +40,7 @@ class PyOpenFecApiClass(object):
     wait_time = 0.5
 
     def to_dict(self):
-        return self.__dict__()
+        return self.__dict__
 
     def to_json(self):
         return json.dumps(self.to_dict())
