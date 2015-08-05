@@ -59,23 +59,27 @@ class Filing(utils.PyOpenFecApiPaginatedClass):
                                                         ft=self.form_type,
                                                         rtf=self.report_type_full)
 
+    @utils.default_empty_list
     def select_receipts(self, **kwargs):
         return [t for t in ScheduleATransaction.fetch(
             min_image_number=self.beginning_image_number,
             max_image_number=self.ending_image_number,
             **kwargs)]
 
+    @utils.default_empty_list
     def all_receipts(self):
         return [t for t in ScheduleATransaction.fetch(
             min_image_number=self.beginning_image_number,
             max_image_number=self.ending_image_number)]
 
+    @utils.default_empty_list
     def select_disbursements(self, **kwargs):
         return [t for t in ScheduleBTransaction.fetch(
             min_image_number=self.beginning_image_number,
             max_image_number=self.ending_image_number,
             **kwargs)]
 
+    @utils.default_empty_list
     def all_disbursements(self):
         return [r for r in ScheduleBTransaction.fetch(
             min_image_number=self.beginning_image_number,

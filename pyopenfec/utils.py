@@ -7,7 +7,7 @@ import requests
 import six
 
 if six.PY2:
-    from exceptions import Exception, NotImplementedError
+    from exceptions import Exception, NotImplementedError, TypeError
 
 
 API_KEY = os.environ.get('OPENFEC_API_KEY', None)
@@ -160,3 +160,12 @@ class PyOpenFecApiIndexedClass(PyOpenFecApiClass):
                             last_index = indexed_results['pagination']['last_indexes']['last_index']
                         else:
                             last_index = None
+
+
+def default_empty_list(func):
+    def inner(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except TypeError:
+            return []
+    return inner

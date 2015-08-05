@@ -56,35 +56,53 @@ class Committee(utils.PyOpenFecApiPaginatedClass):
                 self._totals[ct.cycle] = ct
         return self._totals
 
+    @utils.default_empty_list
     def select_filings(self, **kwargs):
         return [f for f in Filing.fetch(committee_id=self.committee_id, **kwargs)]
 
+    @utils.default_empty_list
     def all_filings(self):
         return [f for f in Filing.fetch(committee_id=self.committee_id)]
 
+    @utils.default_empty_list
     def select_reports(self, **kwargs):
         resource_path = 'committee/{cid}/reports'.format(cid=self.committee_id)
         return [r for r in Report.fetch(resource=resource_path,
                                         committee_id=self.committee_id,
                                         **kwargs)]
 
+    @utils.default_empty_list
     def all_reports(self):
         resource_path = 'committee/{cid}/reports'.format(cid=self.committee_id)
         return [r for r in Report.fetch(resource=resource_path,
                                         committee_id=self.committee_id)]
 
+    @utils.default_empty_list
     def select_receipts(self, **kwargs):
         return [t for t in ScheduleATransaction.fetch(
             committee_id=self.committee_id, **kwargs)]
 
+    @utils.default_empty_list
     def all_receipts(self):
         return [t for t in ScheduleATransaction.fetch(
             committee_id=self.committee_id)]
 
+    @utils.default_empty_list
+    def select_contributions(self, **kwargs):
+        return [t for t in ScheduleATransaction.fetch(
+            contributor_id=self.committee_id, **kwargs)]
+
+    @utils.default_empty_list
+    def all_contributions(self):
+        return [t for t in ScheduleATransaction.fetch(
+            contributor_id=self.committee_id)]
+
+    @utils.default_empty_list
     def select_disbursements(self, **kwargs):
         return [t for t in ScheduleBTransaction.fetch(
             committee_id=self.committee_id, **kwargs)]
 
+    @utils.default_empty_list
     def all_disbursements(self):
         return [r for r in ScheduleBTransaction.fetch(
             committee_id=self.committee_id)]
