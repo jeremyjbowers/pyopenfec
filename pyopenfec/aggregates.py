@@ -1,7 +1,7 @@
 from . import utils
 
 
-class CommitteeTotals(utils.PyOpenFecApiClass):
+class CommitteeTotals(utils.PyOpenFecApiPaginatedClass):
 
     def __init__(self, **kwargs):
         self.all_loans_received = None

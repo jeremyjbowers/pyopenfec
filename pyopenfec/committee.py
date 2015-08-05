@@ -4,7 +4,7 @@ from .report import Report
 from .aggregates import CommitteeTotals
 
 
-class Committee(utils.PyOpenFecApiClass):
+class Committee(utils.PyOpenFecApiPaginatedClass):
 
     def __init__(self, **kwargs):
         self.candidate_ids = None
@@ -73,7 +73,7 @@ class Committee(utils.PyOpenFecApiClass):
                                         committee_id=self.committee_id)]
 
 
-class CommitteeHistoryPeriod(utils.PyOpenFecApiClass):
+class CommitteeHistoryPeriod(utils.PyOpenFecApiPaginatedClass):
 
     def __init__(self, **kwargs):
         self.city = None

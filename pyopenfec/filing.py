@@ -1,7 +1,7 @@
 from . import utils
 
 
-class Filing(utils.PyOpenFecApiClass):
+class Filing(utils.PyOpenFecApiPaginatedClass):
 
     def __init__(self, **kwargs):
         self.amendment_indicator = None

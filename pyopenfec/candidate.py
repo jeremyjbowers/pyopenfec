@@ -4,7 +4,7 @@ from . import utils
 from .committee import Committee
 
 
-class Candidate(utils.PyOpenFecApiClass):
+class Candidate(utils.PyOpenFecApiPaginatedClass):
 
     def __init__(self, **kwargs):
         self.active_through = None
@@ -60,7 +60,7 @@ class Candidate(utils.PyOpenFecApiClass):
         return self._committees
 
 
-class CandidateHistoryPeriod(utils.PyOpenFecApiClass):
+class CandidateHistoryPeriod(utils.PyOpenFecApiPaginatedClass):
 
     def __init__(self, **kwargs):
         self.address_city = None
