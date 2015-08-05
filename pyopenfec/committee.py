@@ -1,4 +1,5 @@
 from . import utils
+from .filing import Filing
 
 
 class Committee(utils.PyOpenFecApiClass):
@@ -41,6 +42,12 @@ class Committee(utils.PyOpenFecApiClass):
             for hp in CommitteeHistoryPeriod.fetch(resource=resource_path):
                 self._history[hp.cycle] = hp
         return self._history
+
+    def select_filings(self, **kwargs):
+        return [f for f in Filing.fetch(committee_id=self.committee_id, **kwargs)]
+
+    def all_filings(self):
+        return [f for f in Filing.fetch(committee_id=self.committee_id)]
 
 
 class CommitteeHistoryPeriod(utils.PyOpenFecApiClass):
