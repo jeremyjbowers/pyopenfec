@@ -2,6 +2,7 @@ from . import utils
 from .filing import Filing
 from .report import Report
 from .aggregates import CommitteeTotals
+from .transaction import ScheduleATransaction, ScheduleBTransaction
 
 
 class Committee(utils.PyOpenFecApiPaginatedClass):
@@ -71,6 +72,22 @@ class Committee(utils.PyOpenFecApiPaginatedClass):
         resource_path = 'committee/{cid}/reports'.format(cid=self.committee_id)
         return [r for r in Report.fetch(resource=resource_path,
                                         committee_id=self.committee_id)]
+
+    def select_receipts(self, **kwargs):
+        return [t for t in ScheduleATransaction.fetch(
+            committee_id=self.committee_id, **kwargs)]
+
+    def all_receipts(self):
+        return [t for t in ScheduleATransaction.fetch(
+            committee_id=self.committee_id)]
+
+    def select_disbursements(self, **kwargs):
+        return [t for t in ScheduleBTransaction.fetch(
+            committee_id=self.committee_id, **kwargs)]
+
+    def all_disbursements(self):
+        return [r for r in ScheduleBTransaction.fetch(
+            committee_id=self.committee_id)]
 
 
 class CommitteeHistoryPeriod(utils.PyOpenFecApiPaginatedClass):

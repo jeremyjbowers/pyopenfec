@@ -1,4 +1,5 @@
 from . import utils
+from .transaction import ScheduleATransaction, ScheduleBTransaction
 
 
 class Filing(utils.PyOpenFecApiPaginatedClass):
@@ -57,3 +58,25 @@ class Filing(utils.PyOpenFecApiPaginatedClass):
                                                         cid=self.committee_id,
                                                         ft=self.form_type,
                                                         rtf=self.report_type_full)
+
+    def select_receipts(self, **kwargs):
+        return [t for t in ScheduleATransaction.fetch(
+            min_image_number=self.beginning_image_number,
+            max_image_number=self.ending_image_number,
+            **kwargs)]
+
+    def all_receipts(self):
+        return [t for t in ScheduleATransaction.fetch(
+            min_image_number=self.beginning_image_number,
+            max_image_number=self.ending_image_number)]
+
+    def select_disbursements(self, **kwargs):
+        return [t for t in ScheduleBTransaction.fetch(
+            min_image_number=self.beginning_image_number,
+            max_image_number=self.ending_image_number,
+            **kwargs)]
+
+    def all_disbursements(self):
+        return [r for r in ScheduleBTransaction.fetch(
+            min_image_number=self.beginning_image_number,
+            max_image_number=self.ending_image_number)]

@@ -142,8 +142,6 @@ class PyOpenFecApiIndexedClass(PyOpenFecApiClass):
             if len(initial_results['results']) > 0:
                 for result in initial_results['results']:
                     yield cls(**result)
-        else:
-            yield []
 
         if initial_results.get('pagination', None):
             if initial_results['pagination'].get('pages', None):
