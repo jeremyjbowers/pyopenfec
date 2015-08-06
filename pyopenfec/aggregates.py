@@ -93,3 +93,85 @@ class CommitteeTotals(utils.PyOpenFecApiPaginatedClass):
             csd=self.coverage_start_date,
             ced=self.coverage_end_date
         ))
+
+
+class AggregateScheduleAByContributor(utils.PyOpenFecApiPaginatedClass):
+
+    def __init__(self, **kwargs):
+        self.committee_id = None
+        self.contributor_id = None
+        self.contributor_name = None
+        self.cycle = None
+        self.image_number = None
+        self.total = None
+        self.year = None
+
+        for k, v in kwargs.items():
+            setattr(self, k, v)
+
+    @classmethod
+    def fetch(cls, **kwargs):
+        if 'resource' not in kwargs:
+            kwargs['resource'] = 'schedules/schedule_a/by_contributor'
+
+        super(AggregateScheduleAByContributor, cls).fetch(**kwargs)
+
+
+class AggregateScheduleABySize(utils.PyOpenFecApiPaginatedClass):
+
+    def __init__(self, **kwargs):
+        self.committee_id = None
+        self.count = None
+        self.cycle = None
+        self.size = None
+        self.total = None
+
+        for k, v in kwargs.items():
+            setattr(self, k, v)
+
+    @classmethod
+    def fetch(cls, **kwargs):
+        if 'resource' not in kwargs:
+            kwargs['resource'] = 'schedules/schedule_a/by_size'
+
+        super(AggregateScheduleABySize, cls).fetch(**kwargs)
+
+
+class AggregateScheduleAByState(utils.PyOpenFecApiPaginatedClass):
+
+    def __init__(self, **kwargs):
+        self.committee_id = None
+        self.count = None
+        self.cycle = None
+        self.state = None
+        self.total = None
+
+        for k, v in kwargs.items():
+            setattr(self, k, v)
+
+    @classmethod
+    def fetch(cls, **kwargs):
+        if 'resource' not in kwargs:
+            kwargs['resource'] = 'schedules/schedule_a/by_state'
+
+        super(AggregateScheduleAByState, cls).fetch(**kwargs)
+
+
+class AggregateScheduleAByZip(utils.PyOpenFecApiPaginatedClass):
+
+    def __init__(self, **kwargs):
+        self.committee_id = None
+        self.count = None
+        self.cycle = None
+        self.zip = None
+        self.total = None
+
+        for k, v in kwargs.items():
+            setattr(self, k, v)
+
+    @classmethod
+    def fetch(cls, **kwargs):
+        if 'resource' not in kwargs:
+            kwargs['resource'] = 'schedules/schedule_a/by_zip'
+
+        super(AggregateScheduleAByZip, cls).fetch(**kwargs)

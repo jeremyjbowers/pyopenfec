@@ -1,7 +1,9 @@
 from . import utils
 from .filing import Filing
 from .report import Report
-from .aggregates import CommitteeTotals
+from .aggregates import (CommitteeTotals, AggregateScheduleAByZip,
+                         AggregateScheduleAByState, AggregateScheduleABySize,
+                         AggregateScheduleAByContributor)
 from .transaction import ScheduleATransaction, ScheduleBTransaction
 
 
@@ -106,6 +108,34 @@ class Committee(utils.PyOpenFecApiPaginatedClass):
     def all_disbursements(self):
         return [r for r in ScheduleBTransaction.fetch(
             committee_id=self.committee_id)]
+
+    @utils.default_empty_list
+    def total_receipts_by_state(self, **kwargs):
+        resource = 'committee/{cid}/schedules/schedule_a/by_state'.format(
+            cid=self.committee_id)
+        return [a for a in AggregateScheduleAByState.fetch(
+            resource=resource, **kwargs)]
+
+    @utils.default_empty_list
+    def total_receipts_by_size(self, **kwargs):
+        resource = 'committee/{cid}/schedules/schedule_a/by_size'.format(
+            cid=self.committee_id)
+        return [a for a in AggregateScheduleABySize.fetch(
+            resource=resource, **kwargs)]
+
+    @utils.default_empty_list
+    def total_receipts_by_zip(self, **kwargs):
+        resource = 'committee/{cid}/schedules/schedule_a/by_zip'.format(
+            cid=self.committee_id)
+        return [a for a in AggregateScheduleAByZip.fetch(
+            resource=resource, **kwargs)]
+
+    @utils.default_empty_list
+    def total_receipts_by_contributor(self, **kwargs):
+        resource = 'committee/{cid}/schedules/schedule_a/by_contributor'.format(
+            cid=self.committee_id)
+        return [a for a in AggregateScheduleAByContributor.fetch(
+            resource=resource, **kwargs)]
 
 
 class CommitteeHistoryPeriod(utils.PyOpenFecApiPaginatedClass):
