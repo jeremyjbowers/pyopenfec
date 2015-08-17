@@ -65,7 +65,8 @@ class ScheduleATransaction(utils.PyOpenFecApiIndexedClass):
         if 'resource' not in kwargs:
             kwargs['resource'] = 'schedules/schedule_a'
 
-        super(ScheduleATransaction, cls).fetch(**kwargs)
+        for record in super(ScheduleATransaction, cls).fetch(**kwargs):
+            yield record
 
     def __unicode__(self):
         return unicode("{cid} receipt: {fn} ({t}, {d})".format(
@@ -140,7 +141,8 @@ class ScheduleBTransaction(utils.PyOpenFecApiIndexedClass):
         if 'resource' not in kwargs:
             kwargs['resource'] = 'schedules/schedule_b'
 
-        super(ScheduleBTransaction, cls).fetch(**kwargs)
+        for record in super(ScheduleBTransaction, cls).fetch(**kwargs):
+            yield record
 
     def __unicode__(self):
         return unicode("{cid} receipt: {fn} ({t}, {d})".format(
