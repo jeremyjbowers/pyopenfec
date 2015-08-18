@@ -162,6 +162,19 @@ class PyOpenFecApiIndexedClass(PyOpenFecApiClass):
                             last_index = None
 
 
+class SearchMixin(object):
+
+    @classmethod
+    def search(cls, querystring):
+        resource = 'names/%ss' % cls.__name__.lower()
+        search_result = cls._make_request(**{"resource": resource,
+                                             "q": querystring})
+        identifiers = [r['id'] for r in search_result['results']]
+        identifier_field = '{c}_id'.format(c=cls.__name__.lower())
+        for o in cls.fetch(**{identifier_field: identifiers}):
+            yield o
+
+
 def default_empty_list(func):
     def inner(*args, **kwargs):
         try:

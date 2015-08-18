@@ -7,7 +7,7 @@ from .aggregates import (CommitteeTotals, AggregateScheduleAByZip,
 from .transaction import ScheduleATransaction, ScheduleBTransaction
 
 
-class Committee(utils.PyOpenFecApiPaginatedClass):
+class Committee(utils.PyOpenFecApiPaginatedClass, utils.SearchMixin):
 
     def __init__(self, **kwargs):
         self.candidate_ids = None

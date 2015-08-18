@@ -4,7 +4,7 @@ from . import utils
 from .committee import Committee
 
 
-class Candidate(utils.PyOpenFecApiPaginatedClass):
+class Candidate(utils.PyOpenFecApiPaginatedClass, utils.SearchMixin):
 
     def __init__(self, **kwargs):
         self.active_through = None
