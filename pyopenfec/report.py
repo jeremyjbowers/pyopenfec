@@ -1,7 +1,7 @@
 from . import utils
 
 
-class Report(utils.PyOpenFecApiClass):
+class Report(utils.PyOpenFecApiPaginatedClass):
 
     def __init__(self, **kwargs):
         self.aggregate_amount_personal_contributions_general = None

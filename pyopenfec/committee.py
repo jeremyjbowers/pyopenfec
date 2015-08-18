@@ -1,10 +1,13 @@
 from . import utils
 from .filing import Filing
 from .report import Report
-from .aggregates import CommitteeTotals
+from .aggregates import (CommitteeTotals, AggregateScheduleAByZip,
+                         AggregateScheduleAByState, AggregateScheduleABySize,
+                         AggregateScheduleAByContributor)
+from .transaction import ScheduleATransaction, ScheduleBTransaction
 
 
-class Committee(utils.PyOpenFecApiClass):
+class Committee(utils.PyOpenFecApiPaginatedClass):
 
     def __init__(self, **kwargs):
         self.candidate_ids = None
@@ -55,25 +58,87 @@ class Committee(utils.PyOpenFecApiClass):
                 self._totals[ct.cycle] = ct
         return self._totals
 
+    @utils.default_empty_list
     def select_filings(self, **kwargs):
         return [f for f in Filing.fetch(committee_id=self.committee_id, **kwargs)]
 
+    @utils.default_empty_list
     def all_filings(self):
         return [f for f in Filing.fetch(committee_id=self.committee_id)]
 
+    @utils.default_empty_list
     def select_reports(self, **kwargs):
         resource_path = 'committee/{cid}/reports'.format(cid=self.committee_id)
         return [r for r in Report.fetch(resource=resource_path,
                                         committee_id=self.committee_id,
                                         **kwargs)]
 
+    @utils.default_empty_list
     def all_reports(self):
         resource_path = 'committee/{cid}/reports'.format(cid=self.committee_id)
         return [r for r in Report.fetch(resource=resource_path,
                                         committee_id=self.committee_id)]
 
+    @utils.default_empty_list
+    def select_receipts(self, **kwargs):
+        return [t for t in ScheduleATransaction.fetch(
+            committee_id=self.committee_id, **kwargs)]
 
-class CommitteeHistoryPeriod(utils.PyOpenFecApiClass):
+    @utils.default_empty_list
+    def all_receipts(self):
+        return [t for t in ScheduleATransaction.fetch(
+            committee_id=self.committee_id)]
+
+    @utils.default_empty_list
+    def select_contributions(self, **kwargs):
+        return [t for t in ScheduleATransaction.fetch(
+            contributor_id=self.committee_id, **kwargs)]
+
+    @utils.default_empty_list
+    def all_contributions(self):
+        return [t for t in ScheduleATransaction.fetch(
+            contributor_id=self.committee_id)]
+
+    @utils.default_empty_list
+    def select_disbursements(self, **kwargs):
+        return [t for t in ScheduleBTransaction.fetch(
+            committee_id=self.committee_id, **kwargs)]
+
+    @utils.default_empty_list
+    def all_disbursements(self):
+        return [r for r in ScheduleBTransaction.fetch(
+            committee_id=self.committee_id)]
+
+    @utils.default_empty_list
+    def total_receipts_by_state(self, **kwargs):
+        resource = 'committee/{cid}/schedules/schedule_a/by_state'.format(
+            cid=self.committee_id)
+        return [a for a in AggregateScheduleAByState.fetch(
+            resource=resource, **kwargs)]
+
+    @utils.default_empty_list
+    def total_receipts_by_size(self, **kwargs):
+        resource = 'committee/{cid}/schedules/schedule_a/by_size'.format(
+            cid=self.committee_id)
+        return [a for a in AggregateScheduleABySize.fetch(
+            resource=resource, **kwargs)]
+
+    @utils.default_empty_list
+    def total_receipts_by_zip(self, **kwargs):
+        resource = 'committee/{cid}/schedules/schedule_a/by_zip'.format(
+            cid=self.committee_id)
+        return [a for a in AggregateScheduleAByZip.fetch(
+            resource=resource, **kwargs)]
+
+    @utils.default_empty_list
+    def total_receipts_by_contributor(self, **kwargs):
+        resource = 'committee/{cid}/schedules/schedule_a/by_contributor'.format(
+            cid=self.committee_id)
+        return [a for a in AggregateScheduleAByContributor.fetch(
+            resource=resource, **kwargs)]
+
+
+class CommitteeHistoryPeriod(utils.PyOpenFecApiPaginatedClass):
 
     def __init__(self, **kwargs):
         self.city = None

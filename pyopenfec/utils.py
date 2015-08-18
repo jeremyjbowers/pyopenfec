@@ -7,7 +7,7 @@ import requests
 import six
 
 if six.PY2:
-    from exceptions import Exception
+    from exceptions import Exception, NotImplementedError, TypeError
 
 
 API_KEY = os.environ.get('OPENFEC_API_KEY', None)
@@ -53,6 +53,51 @@ class PyOpenFecApiClass(object):
             return initial_results['pagination']['count']
 
     @classmethod
+    def _throttled_request(cls, url, params):
+
+        if cls.ratelimit_remaining == 0:
+            while cls.ratelimit_remaining == 0:
+                cls.wait_time = cls.wait_time * 1.5
+                logging.warn(
+                    'Rate limit was about to be exceeded. Waiting {}s.'.format(
+                        cls.wait_time))
+                time.sleep(cls.wait_time)
+                response = requests.get(url, params=params)
+                cls.ratelimit_remaining = int(response.headers['x-ratelimit-remaining'])
+        else:
+            response = requests.get(url, params=params)
+            cls.ratelimit_remaining = int(response.headers['x-ratelimit-remaining'])
+
+        cls.wait_time = 0.5
+
+        return response
+
+    @classmethod
+    def fetch(cls, **kwargs):
+        raise NotImplementedError('fetch command implemented in subclasses only')
+
+    @classmethod
+    def _make_request(cls, resource, **kwargs):
+        url = BASE_URL + VERSION + '/%s' % resource
+
+        if not API_KEY:
+            raise PyOpenFecException('Please export an env var OPENFEC_API_KEY with your API key.')
+
+        params = dict(kwargs)
+        params['api_key'] = API_KEY
+
+        r = cls._throttled_request(url, params)
+        logging.debug(r.url)
+
+        if r.status_code != 200:
+            raise PyOpenFecException('OpenFEC site returned a status code of %s for this request.' % r.status_code)
+
+        return r.json()
+
+
+class PyOpenFecApiPaginatedClass(PyOpenFecApiClass):
+
+    @classmethod
     def fetch(cls, **kwargs):
         if 'resource' in kwargs:
             resource = kwargs.pop('resource')
@@ -82,40 +127,45 @@ class PyOpenFecApiClass(object):
 
                         current_page += 1
 
-    @classmethod
-    def _throttled_request(cls, url, params):
 
-        if cls.ratelimit_remaining == 0:
-            while cls.ratelimit_remaining == 0:
-                cls.wait_time = cls.wait_time * 1.5
-                logging.warn(
-                    'Rate limit was about to be exceeded. Waiting {}s.'.format(
-                        cls.wait_time))
-                time.sleep(cls.wait_time)
-                response = requests.get(url, params=params)
-                cls.ratelimit_remaining = int(response.headers['x-ratelimit-remaining'])
+class PyOpenFecApiIndexedClass(PyOpenFecApiClass):
+
+    @classmethod
+    def fetch(cls, **kwargs):
+        if 'resource' in kwargs:
+            resource = kwargs.pop('resource')
         else:
-            response = requests.get(url, params=params)
-            cls.ratelimit_remaining = int(response.headers['x-ratelimit-remaining'])
+            resource = '%ss' % cls.__name__.lower()
+        initial_results = cls._make_request(resource, **kwargs)
 
-        cls.wait_time = 0.5
+        if initial_results.get('results', None):
+            if len(initial_results['results']) > 0:
+                for result in initial_results['results']:
+                    yield cls(**result)
 
-        return response
+        if initial_results.get('pagination', None):
+            if initial_results['pagination'].get('pages', None):
+                if initial_results['pagination']['pages'] > 1:
+                    last_index = initial_results['pagination']['last_indexes']['last_index']
 
-    @classmethod
-    def _make_request(cls, resource, **kwargs):
-        url = BASE_URL + VERSION + '/%s' % resource
+                    while last_index is not None:
+                        params = dict(kwargs)
+                        params['last_index'] = int(last_index)
+                        indexed_results = cls._make_request(resource, **params)
 
-        if not API_KEY:
-            raise PyOpenFecException('Please export an env var OPENFEC_API_KEY with your API key.')
+                        if indexed_results.get('results', None):
+                            if len(indexed_results['results']) > 0:
+                                for result in indexed_results['results']:
+                                    yield cls(**result)
+                            last_index = indexed_results['pagination']['last_indexes']['last_index']
+                        else:
+                            last_index = None
 
-        params = dict(kwargs)
-        params['api_key'] = API_KEY
 
-        r = cls._throttled_request(url, params)
-        logging.debug(r.url)
-
-        if r.status_code != 200:
-            raise PyOpenFecException('OpenFEC site returned a status code of %s for this request.' % r.status_code)
-
-        return r.json()
+def default_empty_list(func):
+    def inner(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except TypeError:
+            return []
+    return inner
