@@ -1,7 +1,10 @@
-from pyopenfec import utils
+from collections import defaultdict
+
+from . import utils
+from .committee import Committee
 
 
-class Candidate(utils.PyOpenFecApiClass):
+class Candidate(utils.PyOpenFecApiPaginatedClass, utils.SearchMixin):
 
     def __init__(self, **kwargs):
         self.active_through = None
@@ -20,6 +23,7 @@ class Candidate(utils.PyOpenFecApiClass):
         self.party_full = None
         self.state = None
         self._history = None
+        self._committees = None
 
         for k, v in kwargs.items():
             setattr(self, k, v)
@@ -41,8 +45,22 @@ class Candidate(utils.PyOpenFecApiClass):
                 self._history[hp.two_year_period] = hp
         return self._history
 
+    @property
+    def most_recent_cycle(self):
+        return max(self.cycles)
 
-class CandidateHistoryPeriod(utils.PyOpenFecApiClass):
+    @property
+    def committees(self):
+        if self._committees is None:
+            committees_by_cycle = defaultdict(list)
+            for committee in Committee.fetch(candidate_id=self.candidate_id):
+                for cycle in committee.cycles:
+                    committees_by_cycle[cycle].append(committee)
+            self._committees = dict(committees_by_cycle)
+        return self._committees
+
+
+class CandidateHistoryPeriod(utils.PyOpenFecApiPaginatedClass):
 
     def __init__(self, **kwargs):
         self.address_city = None

@@ -3,6 +3,25 @@ A Python wrapper for the OpenFEC API. Documentation for this API can be found [h
 
 ## Installation
 
+ 1. Clone this repository
+```
+git clone https://github.com/jeremyjbowers/pyopenfec.git
+```
+   
+ 2. navigate into the new directory
+```
+cd pyopenfec
+```
+
+ 3. (optional) start the virtual environment you'd like to install to
+
+ 4. run
+```
+python setup.py install
+```
+
+_Dependencies include [six](https://pypi.python.org/pypi/six) and [requests](https://pypi.python.org/pypi/requests) (will be installed by `setup.py`)_
+
 ## Examples
 
 ### Candidates
