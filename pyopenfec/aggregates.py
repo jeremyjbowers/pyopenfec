@@ -114,7 +114,8 @@ class AggregateScheduleAByContributor(utils.PyOpenFecApiPaginatedClass):
         if 'resource' not in kwargs:
             kwargs['resource'] = 'schedules/schedule_a/by_contributor'
 
-        super(AggregateScheduleAByContributor, cls).fetch(**kwargs)
+        for record in super(AggregateScheduleAByContributor, cls).fetch(**kwargs):
+            yield record
 
 
 class AggregateScheduleABySize(utils.PyOpenFecApiPaginatedClass):
@@ -134,7 +135,8 @@ class AggregateScheduleABySize(utils.PyOpenFecApiPaginatedClass):
         if 'resource' not in kwargs:
             kwargs['resource'] = 'schedules/schedule_a/by_size'
 
-        super(AggregateScheduleABySize, cls).fetch(**kwargs)
+        for record in super(AggregateScheduleABySize, cls).fetch(**kwargs):
+            yield record
 
 
 class AggregateScheduleAByState(utils.PyOpenFecApiPaginatedClass):
@@ -154,7 +156,8 @@ class AggregateScheduleAByState(utils.PyOpenFecApiPaginatedClass):
         if 'resource' not in kwargs:
             kwargs['resource'] = 'schedules/schedule_a/by_state'
 
-        super(AggregateScheduleAByState, cls).fetch(**kwargs)
+        for record in super(AggregateScheduleAByState, cls).fetch(**kwargs):
+            yield record
 
 
 class AggregateScheduleAByZip(utils.PyOpenFecApiPaginatedClass):
@@ -174,4 +177,5 @@ class AggregateScheduleAByZip(utils.PyOpenFecApiPaginatedClass):
         if 'resource' not in kwargs:
             kwargs['resource'] = 'schedules/schedule_a/by_zip'
 
-        super(AggregateScheduleAByZip, cls).fetch(**kwargs)
+        for record in super(AggregateScheduleAByZip, cls).fetch(**kwargs):
+            yield record

@@ -79,7 +79,7 @@ class ScheduleATransaction(utils.PyOpenFecApiIndexedClass):
     def __str__(self):
         return repr("{cid} receipt: {fn} ({t}, {d})".format(
             cid=self.committee_id,
-            fn=self.file_num,
+            fn=self.file_number,
             t=self.tran_id,
             d=self.receipt_date
         ))
@@ -155,7 +155,7 @@ class ScheduleBTransaction(utils.PyOpenFecApiIndexedClass):
     def __str__(self):
         return repr("{cid} receipt: {fn} ({t}, {d})".format(
             cid=self.committee_id,
-            fn=self.file_num,
+            fn=self.file_number,
             t=self.tran_id,
             d=self.disbursement_date
         ))
