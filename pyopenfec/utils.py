@@ -54,22 +54,22 @@ class PyOpenFecApiClass(object):
 
     @classmethod
     def _throttled_request(cls, url, params):
+        response = None
+        if not cls.ratelimit_remaining == 0:
+            response = requests.get(url, params=params)
+            cls.ratelimit_remaining = int(response.headers['x-ratelimit-remaining'])
 
-        if cls.ratelimit_remaining == 0:
-            while cls.ratelimit_remaining == 0:
-                cls.wait_time = cls.wait_time * 1.5
+        if cls.ratelimit_remaining == 0 or response.status_code == 429:
+            while cls.ratelimit_remaining == 0 or response.status_code == 429:
+                cls.wait_time *= 1.5
                 logging.warn(
-                    'Rate limit was about to be exceeded. Waiting {}s.'.format(
+                    'API rate limit exceeded. Waiting {}s.'.format(
                         cls.wait_time))
                 time.sleep(cls.wait_time)
                 response = requests.get(url, params=params)
                 cls.ratelimit_remaining = int(response.headers['x-ratelimit-remaining'])
-        else:
-            response = requests.get(url, params=params)
-            cls.ratelimit_remaining = int(response.headers['x-ratelimit-remaining'])
 
         cls.wait_time = 0.5
-
         return response
 
     @classmethod
