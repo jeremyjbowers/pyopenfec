@@ -26,19 +26,19 @@ _Dependencies include [six](https://pypi.python.org/pypi/six) and [requests](htt
 
 ### Candidates
 
-####```Candidate```
+#### Candidate
 The `Candidate` class holds fields for each candidate in the OpenFEC API.
 
 A number of class and instance methods are available.
 
-#####```Candidate.count()```
+##### count
 The `Candidate.count()` method will return the number of Candidate objects available for a given query. Note: This method returns an integer representing the number of items available in the OpenFEC API. It does not return a list of objects.
 ```
 from pyopenfec import Candidate
 candidate_count = Candidate.count(cycle=2016, office="P", candidate_status="C")
 ```
 
-####```Candidate.fetch()```
+#### fetch
 The `Candidate.fetch()` method will return a list of Candidate objects available for a given query. This method will automatically page through the results and return all objects available in the OpenFEC API.
 ```
 from pyopenfec import Candidate
